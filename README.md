@@ -1,4 +1,6 @@
 # Embeddable UI:
+> This document describes the communication protocol for embeddable UIs.
+> Implemented by [mcp-ui](https://github.com/idosal/mcp-ui).
 
 # Concept
 
