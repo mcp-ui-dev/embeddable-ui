@@ -1,4 +1,5 @@
 # Embeddable UI:
+
 > This document describes the communication protocol for embeddable UIs.
 > Implemented by [mcp-ui](https://github.com/idosal/mcp-ui).
 
@@ -29,6 +30,7 @@ type Message = {
 - [`link`](#link) - the iframe asks the host to navigate to a link
 
 ### `intent`
+
 - indicates that the user has interacted with the UI and expressed an intent, and the host should act on it
 - the payload is an object with the following properties:
   - `intent` - the intent that the user expressed
@@ -204,10 +206,10 @@ window.parent.postMessage(
 See also [Asynchronous Data Requests with Message IDs](#asynchronous-data-requests-with-message-ids)
 
 ## Reserved Message Types - from the host to the iframe
+
 - [`ui-lifecycle-iframe-render-data`](#ui-lifecycle-iframe-render-data) - the host sends the iframe render data
-- [`ui-action-received`](#ui-action-received) - the host sends the iframe to indicate that the action has been received
-- [`ui-action-response`](#ui-action-response) - the iframe sends the host to indicate that the action has been processed
-- [`ui-action-error`](#ui-action-error) - the iframe sends the host to indicate that the action has failed
+- [`ui-message-received`](#ui-message-received) - the host sends the iframe to indicate that the action has been received
+- [`ui-message-response`](#ui-message-response) - the iframe sends the host to indicate that the action has been processed or failed
 
 ### `ui-lifecycle-iframe-render-data`
 
@@ -218,26 +220,18 @@ See also [Asynchronous Data Requests with Message IDs](#asynchronous-data-reques
 **Example:**
 See [Render Data](#render-data)
 
-### `ui-action-received`
+### `ui-message-received`
 
 - a message that the host sends to the iframe to indicate that the action has been received. The original messageId is passed back to the host to allow the host to track the action. This is useful for `request-data` messages, but is not limited to this type.
   **Example:**
   See [Asynchronous Data Requests with Message IDs](#asynchronous-data-requests-with-message-ids)
 
-### `ui-action-response`
+### `ui-message-response`
 
 - a message that the iframe sends to the host to indicate that the action has been processed. The original messageId is passed back to the host to allow the host to track the action. This is useful for `request-data` messages, but is not limited to this type.
 - the payload is an object with the following properties:
   - `response` - the response to the action
-
-**Example:**
-See [Asynchronous Data Requests with Message IDs](#asynchronous-data-requests-with-message-ids)
-
-### `ui-action-error`
-
-- a message that the iframe sends to the host to indicate that the action has failed. The original messageId is passed back to the host to allow the host to track the action. This is useful for `request-data` messages, but is not limited to this type.
-- the payload is an object with the following properties:
-  - `error` - the error that occurred
+  - `error` - the error, if any, that occurred
 
 **Example:**
 See [Asynchronous Data Requests with Message IDs](#asynchronous-data-requests-with-message-ids)
@@ -336,13 +330,18 @@ button.addEventListener("click", () => {
 });
 
 window.addEventListener("message", (event) => {
-  if (event.data.type === "ui-action-response") {
-    const { messageId, response } = event.data.payload;
-    const callback = requests.get(messageId);
-    if (callback) {
-      callback(response);
-      requests.delete(messageId);
+  if (event.data.type === "ui-message-response") {
+    const { messageId, response, error } = event.data.payload;
+    if (error) {
+      // handle the error
+    } else {
+      const callback = requests.get(messageId);
+      if (callback) {
+        callback(response);
+      }
     }
+    // clean up the request
+    requests.delete(messageId);
   }
 });
 ```
@@ -354,7 +353,7 @@ window.addEventListener("message", async (event) => {
   if (event.data.messageId) {
     iframe.contentWindow.postMessage(
       {
-        type: "ui-action-received",
+        type: "ui-message-received",
         messageId: event.data.messageId,
       },
       "*"
@@ -371,7 +370,7 @@ window.addEventListener("message", async (event) => {
         const paymentMethods = await fetchPaymentMethods(params);
         iframe.contentWindow.postMessage(
           {
-            type: "ui-action-response",
+            type: "ui-message-response",
             messageId: messageId,
             payload: { response: { paymentMethods } },
           },
@@ -380,7 +379,7 @@ window.addEventListener("message", async (event) => {
       } catch (error) {
         iframe.contentWindow.postMessage(
           {
-            type: "ui-action-error",
+            type: "ui-message-response",
             messageId: messageId,
             payload: { error },
           },
