@@ -323,7 +323,7 @@ button.addEventListener("click", () => {
   window.parent.postMessage(
     {
       type: "ui-request-data",
-      messageId: "123",
+      messageId,
       payload: {
         requestType: "get-payment-methods",
         params: {
