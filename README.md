@@ -29,7 +29,6 @@ type Message = {
 - [`link`](#link) - the iframe asks the host to navigate to a link
 
 ### `intent`
-
 - indicates that the user has interacted with the UI and expressed an intent, and the host should act on it
 - the payload is an object with the following properties:
   - `intent` - the intent that the user expressed
