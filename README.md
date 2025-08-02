@@ -20,6 +20,12 @@ type Message = {
 
 ## Message Types
 
+- [`intent`](#intent) - the user has interacted with the UI and expressed an intent, and the host should act on it
+- [`notify`](#notify) - the iframe already acted upon the user interaction, and is notifying the host to trigger any side effects
+- [`prompt`](#prompt) - the iframe asks the host to run a prompt
+- [`tool`](#tool) - the iframe asks the host to run a tool call
+- [`link`](#link) - the iframe asks the host to navigate to a link
+
 ### `intent`
 
 - indicates that the user has interacted with the UI and expressed an intent, and the host should act on it
@@ -131,6 +137,10 @@ window.parent.postMessage(
 
 ## Reserved Message Types - from the iframe to the host
 
+- [`ui-lifecycle-iframe-ready`](#ui-lifecycle-iframe-ready) - the iframe is ready to receive messages
+- [`ui-size-change`](#ui-size-change) - the iframe's size has changed and the host should adjust the iframe's size
+- [`ui-request-data`](#ui-request-data) - the iframe sends a request to the host to request data
+
 ### `ui-lifecycle-iframe-ready`
 
 - indicates that the iframe is ready to receive messages
@@ -193,6 +203,10 @@ window.parent.postMessage(
 See also [Asynchronous Data Requests with Message IDs](#asynchronous-data-requests-with-message-ids)
 
 ## Reserved Message Types - from the host to the iframe
+- [`ui-lifecycle-iframe-render-data`](#ui-lifecycle-iframe-render-data) - the host sends the iframe render data
+- [`ui-action-received`](#ui-action-received) - the host sends the iframe to indicate that the action has been received
+- [`ui-action-response`](#ui-action-response) - the iframe sends the host to indicate that the action has been processed
+- [`ui-action-error`](#ui-action-error) - the iframe sends the host to indicate that the action has failed
 
 ### `ui-lifecycle-iframe-render-data`
 
@@ -238,9 +252,9 @@ See [Asynchronous Data Requests with Message IDs](#asynchronous-data-requests-wi
 **Example:**
 See [Render Data](#render-data)
 
-## Usage Examples
+# Usage Examples
 
-### Passing Render Data to the Iframe
+## Passing Render Data to the Iframe
 
 ### In the host:
 
@@ -293,7 +307,7 @@ if (urlParams.get("waitForRenderData") === "true") {
 }
 ```
 
-### Asynchronous Data Requests with Message IDs
+## Asynchronous Data Requests with Message IDs
 
 ### In the iframe:
 
