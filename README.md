@@ -3,9 +3,9 @@
 > This document describes the communication protocol for embeddable UIs.
 > Implemented by [mcp-ui](https://github.com/idosal/mcp-ui).
 
-# Concept
+# Concepts
 
-- iframes communicate with the parent window via postMessage
+- embedded iframes communicate with the parent window via `postMessage`
 - the parent window can send messages to the iframe
 - the iframe can send messages to the parent window
 
